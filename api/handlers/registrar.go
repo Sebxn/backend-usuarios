@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"backend/api/models"
+	"backend/api/utils"
 	"context"
 	"fmt"
 	"net/http"
@@ -31,6 +33,7 @@ func generateJWTToken(uid string) (string, error) {
 }
 
 func RegisterUser(w http.ResponseWriter, r *http.Request, app *firebase.App) error {
+
 	ctx := context.Background()
 	client, err := app.Auth(ctx)
 	if err != nil {
@@ -84,6 +87,28 @@ func RegisterUser(w http.ResponseWriter, r *http.Request, app *firebase.App) err
 		// Manejar errores
 		http.Error(w, "Error al crear el usuario", http.StatusInternalServerError)
 		return err
+	}
+
+	userPostgreSQL := models.User{
+		UID:             user.UID,              // El UID del usuario de Firebase
+		Nombre:          r.FormValue("Nombre"), // Recupera los valores del formulario
+		Apellido:        r.FormValue("Apellido"),
+		SegundoApellido: r.FormValue("SegundoApellido"),
+		Email:           email,
+		Rut:             r.FormValue("Rut"),
+		Fono:            r.FormValue("Fono"),
+	}
+
+	db, err := utils.OpenDBGorm()
+	if err != nil {
+		http.Error(w, "Error al conectar a la base de datos", http.StatusInternalServerError)
+		return err
+	}
+
+	createdUser := db.Create(&userPostgreSQL)
+	if createdUser.Error != nil {
+		http.Error(w, "Error al insertar el usuario en la base de datos", http.StatusInternalServerError)
+		return createdUser.Error
 	}
 
 	// Generar un token JWT para el usuario registrado
