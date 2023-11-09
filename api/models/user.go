@@ -8,6 +8,7 @@ type User struct {
 	Email           string `json:"Email"`
 	Rut             string `json:"Rut"`
 	Fono            string `json:"Fono"`
+	FotoPerfil      string `json:"FotoPerfil" gorm:"column:img_profile"`
 }
 
 // Configura la tabla de la base de datos

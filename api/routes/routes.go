@@ -33,6 +33,7 @@ func ConfigureRoutes(r *mux.Router, app *firebase.App) {
 	r.HandleFunc("/users/{id}", handlers.GetUserById).Methods("GET")
 	r.HandleFunc("/users/{id}", handlers.DeleteUser).Methods("DELETE")
 	r.HandleFunc("/users/{id}", handlers.UpdateUser).Methods("PATCH")
+	r.HandleFunc("/users/update_profile/{id}", handlers.UpdateProfile).Methods("PATCH")
 
 	r.Handle("/api/facturacion/user_paquetes", http.HandlerFunc(handlers.ObtenerPaquetesByUser))
 	r.Handle("/api/facturacion/actualizar_estado", http.HandlerFunc(handlers.ActualizarEstadoReserva))
