@@ -3,12 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+
 	"backend/api/models"
 	"backend/api/utils"
-	"github.com/gorilla/mux"
-	"backend/api/middleware"
-	"github.com/golang-jwt/jwt/v5"
 
+	"github.com/gorilla/mux"
 )
 
 func AddUser(w http.ResponseWriter, r *http.Request) {
@@ -47,15 +46,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserById(w http.ResponseWriter, r *http.Request) {
-
-	claims, ok := r.Context().Value(middleware.UserContextKey).(*jwt.MapClaims)
-    if !ok {
-        http.Error(w, "Información del usuario no disponible", http.StatusInternalServerError)
-        return
-    }
-
-    uid := (*claims)["uid"].(string) 
-	
+	params := mux.Vars(r)
 	var user models.User
 
 	db, err := utils.OpenDBGorm()
@@ -63,10 +54,8 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error al conectar a la base de datos", http.StatusInternalServerError)
 		return
 	}
+	db.Where("id = ?", params["id"]).First(&user)
 
-	db.Where("id = ?", uid).First(&user)
-
-	db.Where("id = ?", uid).First(&user)
 	if user.UID == "" {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("User not found"))
@@ -99,14 +88,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Usuario eliminado con éxito"))
 }
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
-	claims, ok := r.Context().Value(middleware.UserContextKey).(*jwt.MapClaims)
-    if !ok {
-        http.Error(w, "Información del usuario no disponible", http.StatusInternalServerError)
-        return
-    }
-
-    uid := (*claims)["uid"].(string) 
-
+	params := mux.Vars(r)
 	var user models.User
 
 	db, err := utils.OpenDBGorm()
@@ -115,8 +97,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.Where("id = ?", uid).First(&user)
-
+	db.Where("id = ?", params["id"]).First(&user)
 	if user.UID == "" {
 		http.Error(w, "Usuario no encontrado", http.StatusNotFound)
 		return
