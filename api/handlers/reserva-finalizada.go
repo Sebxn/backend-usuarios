@@ -21,10 +21,14 @@ func ReservaFinalizada(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error al conectar a la base de datos", http.StatusInternalServerError)
 			return
 		}
+		
 		// Actualizar la reserva en la base de datos
 		if err := db.Model(&reserva).Updates(models.Reserva{Estado: "Finalizado"}).Error; err != nil {
 			// Manejar el error, por ejemplo, imprimirlo o devolverlo
-			panic(err)
+			http.Error(w, "Error al actualizar la reserva", http.StatusInternalServerError)
+    		return
 		}
 	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Reserva marcada como Finalizado"))
 }

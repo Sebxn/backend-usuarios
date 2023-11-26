@@ -31,4 +31,5 @@ type Reserva struct {
 	SitioWebHotel          string    `json:"sitio_web_hotel"`
 	RowNum                 int       `json:"row_num"`
 	Estado                 string    `json:"comprado"`
+	Estrellas              int       `json:"estrellas"`
 }

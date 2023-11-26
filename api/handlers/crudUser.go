@@ -65,6 +65,8 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	db.Where("id = ?", uid).First(&user)
+
+	db.Where("id = ?", uid).First(&user)
 	if user.UID == "" {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("User not found"))
@@ -84,7 +86,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.First(&user, params["id"])
+	db.Where("id = ?", params["id"]).First(&user)
 
 	if user.UID == "" {
 		w.WriteHeader(http.StatusNotFound)
