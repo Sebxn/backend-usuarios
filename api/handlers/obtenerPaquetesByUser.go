@@ -10,6 +10,7 @@ import (
 )
 
 func ObtenerPaquetesByUser(w http.ResponseWriter, r *http.Request) {
+	
 	// Captura los parámetros de la URL
 	id_usuario := r.URL.Query().Get("id_usuario")
 

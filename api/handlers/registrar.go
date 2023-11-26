@@ -6,31 +6,13 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
-	"time"
+
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
-	"github.com/golang-jwt/jwt/v5"
 )
 
-func generateJWTToken(uid string) (string, error) {
-	// Create a new token object
-	token := jwt.New(jwt.SigningMethodHS256)
 
-	// Set claims (payload)
-	claims := token.Claims.(jwt.MapClaims)
-	claims["uid"] = uid
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix() // Token expires in 24 hours
-	jwtSecret := os.Getenv("JWT_SECRET_KEY")
-	// Generate encoded token and send it as response
-	jwtToken, err := token.SignedString([]byte(jwtSecret))
-	if err != nil {
-		return "", err
-	}
-
-	return jwtToken, nil
-}
 
 func RegisterUser(w http.ResponseWriter, r *http.Request, app *firebase.App) error {
 
@@ -111,16 +93,10 @@ func RegisterUser(w http.ResponseWriter, r *http.Request, app *firebase.App) err
 		return createdUser.Error
 	}
 
-	// Generar un token JWT para el usuario registrado
-	jwtToken, err := generateJWTToken(user.UID)
-	if err != nil {
-		// Manejar errores
-		http.Error(w, "Error al generar el token JWT", http.StatusInternalServerError)
-		return err
-	}
 
 	// Respond with "Contraseña exitosa" y el JWT token
 	fmt.Fprintln(w, "Contraseña exitosa")
-	fmt.Fprintln(w, jwtToken)
+	fmt.Fprintln(w,  user.UID)
+	//dPYL3ow9FbMUgdJYddbLQ9Ohsve2
 	return nil
 }
