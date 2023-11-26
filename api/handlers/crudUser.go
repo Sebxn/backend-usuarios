@@ -54,7 +54,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error al conectar a la base de datos", http.StatusInternalServerError)
 		return
 	}
-	db.First(&user, params["id"])
+	db.Where("id = ?", params["id"]).First(&user)
 
 	if user.UID == "" {
 		w.WriteHeader(http.StatusNotFound)
@@ -75,7 +75,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.First(&user, params["id"])
+	db.Where("id = ?", params["id"]).First(&user)
 
 	if user.UID == "" {
 		w.WriteHeader(http.StatusNotFound)
@@ -97,7 +97,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.First(&user, params["id"])
+	db.Where("id = ?", params["id"]).First(&user)
 	if user.UID == "" {
 		http.Error(w, "Usuario no encontrado", http.StatusNotFound)
 		return

@@ -38,5 +38,7 @@ func ConfigureRoutes(r *mux.Router, app *firebase.App) {
 	r.Handle("/api/facturacion/user_paquetes", http.HandlerFunc(handlers.ObtenerPaquetesByUser))
 	r.Handle("/api/facturacion/actualizar_estado", http.HandlerFunc(handlers.ActualizarEstadoReserva))
 
+	r.HandleFunc("/reservas/{id}/valorar", handlers.ValorarReserva).Methods("POST")
+
 	// Agrega más configuraciones de rutas aquí si es necesario
 }
