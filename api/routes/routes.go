@@ -10,8 +10,8 @@ import (
 )
 
 func ConfigureRoutes(r *mux.Router, app *firebase.App) {
-	// allowedOrigins := []string{"http://localhost:5173"} // Replace with your allowed origins
-	// r.Use(middleware.CorsMiddleware(allowedOrigins))
+	allowedOrigins := []string{"http://localhost:5173"} // Replace with your allowed origins
+	r.Use(middleware.CorsMiddleware(allowedOrigins))
 
 	// r.Handle("/prueba", middleware.TokenAuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	// 	handlers.Prueba(w, r)
@@ -29,7 +29,8 @@ func ConfigureRoutes(r *mux.Router, app *firebase.App) {
 
 	r.Handle("/user", middleware.TokenAuthMiddleware(http.HandlerFunc(handlers.GetUserById))).Methods("GET", "OPTIONS")
 	r.Handle("/user/update", middleware.TokenAuthMiddleware(http.HandlerFunc(handlers.UpdateUser))).Methods("PATCH", "OPTIONS")
-	r.Handle("/api/facturacion/user_paquetes", middleware.TokenAuthMiddleware(http.HandlerFunc(handlers.ObtenerPaquetesByUser))).Methods("GET")
+	//paquetes comprados por el usuario
+	r.Handle("/user/mis_reservas", middleware.TokenAuthMiddleware(http.HandlerFunc(handlers.ObtenerPaquetesByUser))).Methods("GET", "OPTIONS")
 
 	r.HandleFunc("/users/update_profile/{id}", handlers.UpdateProfile).Methods("PATCH") // ???
 

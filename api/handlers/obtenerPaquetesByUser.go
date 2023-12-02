@@ -5,13 +5,22 @@ import (
 
 	"net/http"
 
+	"backend/api/middleware"
 	"backend/api/models"
 	"backend/api/utils"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func ObtenerPaquetesByUser(w http.ResponseWriter, r *http.Request) {
 	// Captura los parámetros de la URL
-	id_usuario := r.URL.Query().Get("id_usuario")
+	claims, ok := r.Context().Value(middleware.UserContextKey).(*jwt.MapClaims)
+	if !ok {
+		http.Error(w, "Información del usuario no disponible", http.StatusInternalServerError)
+		return
+	}
+
+	uid := (*claims)["uid"].(string)
 
 	// Abre la conexión con la base de datos
 	db, err := utils.OpenDB()
@@ -77,7 +86,7 @@ func ObtenerPaquetesByUser(w http.ResponseWriter, r *http.Request) {
 	FROM ranked_reservas
 	WHERE row_num = 1 AND id_usuario = $1
 	ORDER BY id;
-	`, id_usuario)
+	`, uid)
 	if err != nil {
 		http.Error(w, "Error al consultar la base de datos", http.StatusInternalServerError)
 		return
@@ -128,7 +137,7 @@ func ObtenerPaquetesByUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if reservas == nil {
-		http.Error(w, "El usuario no existe", http.StatusInternalServerError)
+		http.Error(w, "El usuario no tiene paquetes", http.StatusInternalServerError)
 		return
 	}
 }

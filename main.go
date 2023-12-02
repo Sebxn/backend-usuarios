@@ -15,7 +15,7 @@ func main() {
 	// Inicializa la configuración de Firebase
 	ctx := context.Background()
 	opt := option.WithCredentialsFile(".env")
-	config := &firebase.Config{ProjectID: "asdasdasdasd-82445"}
+	config := &firebase.Config{ProjectID: "test-5eebf"}
 	app, err := firebase.NewApp(ctx, config, opt)
 	if err != nil {
 		log.Fatalln(err)

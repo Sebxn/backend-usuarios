@@ -3,21 +3,24 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/golang-jwt/jwt/v5"
-	"os"
-	"time"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 
 	firebase "firebase.google.com/go"
 )
+
 type LoginResponse struct {
-	Status string `json:"status"`
+	Status  string `json:"status"`
 	Message string `json:"message"`
 	Token   string `json:"token,omitempty"` // omitempty para no incluir el token si está vacío
 	Error   string `json:"error,omitempty"` // omitempty para no incluir el error si está vacío
 }
+
 func generateJWTToken(uid string) (string, error) {
 	// Create a new token object
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -40,13 +43,14 @@ type FirebaseResponse struct {
 	LocalId string `json:"localId"` // Assumiendo que el JSON de respuesta tiene un campo "localId"
 	// ... otros campos que esperas en la respuesta, como token, email, etc.
 }
+
 func LoginUser(resp http.ResponseWriter, req *http.Request, app *firebase.App) {
 
 	email := req.FormValue("email")
 	password := req.FormValue("password")
 
 	// Define la URL del punto de conexión de Firebase Identity Toolkit para iniciar sesión con contraseña
-	url := "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyANecW9it9IWb6NTmlSv2Q9-30S51uvfIw" // API KEY
+	url := "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAN5HyOCaS1NMqiVKgcYaN1s6fq3oJWbMw" // API KEY
 
 	// Construye la carga útil de la solicitud JSON
 	payload := fmt.Sprintf(`{
@@ -80,19 +84,19 @@ func LoginUser(resp http.ResponseWriter, req *http.Request, app *firebase.App) {
 			fmt.Fprintln(resp, "Error al deserializar la respuesta:", err)
 			return
 		}
-			// Generar un token JWT para el usuario registrado
-			jwtToken, err := generateJWTToken(fr.LocalId)
-			if err != nil {
-				// Construir la respuesta de error
-				loginResp.Error = "Error al generar el token JWT"
-				loginResp.Status = "401"
-				resp.WriteHeader(http.StatusInternalServerError)
-			} else {
-				// Construir la respuesta de éxito
-				loginResp.Message = "Inicio de sesion correcto"
-				loginResp.Token = jwtToken
-				loginResp.Status = "200"
-			}
+		// Generar un token JWT para el usuario registrado
+		jwtToken, err := generateJWTToken(fr.LocalId)
+		if err != nil {
+			// Construir la respuesta de error
+			loginResp.Error = "Error al generar el token JWT"
+			loginResp.Status = "401"
+			resp.WriteHeader(http.StatusInternalServerError)
+		} else {
+			// Construir la respuesta de éxito
+			loginResp.Message = "Inicio de sesion correcto"
+			loginResp.Token = jwtToken
+			loginResp.Status = "200"
+		}
 	} else {
 		// Autenticación fallida
 		fmt.Fprintln(resp, "Error de autenticación:", string(responseBody))
