@@ -6,8 +6,9 @@ import (
 
 	"backend/api/models"
 	"backend/api/utils"
-
 	"github.com/gorilla/mux"
+	"backend/api/middleware"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func AddUser(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +47,15 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserById(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
+
+	claims, ok := r.Context().Value(middleware.UserContextKey).(*jwt.MapClaims)
+    if !ok {
+        http.Error(w, "Información del usuario no disponible", http.StatusInternalServerError)
+        return
+    }
+
+    uid := (*claims)["uid"].(string) 
+
 	var user models.User
 
 	db, err := utils.OpenDBGorm()
@@ -54,14 +63,15 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error al conectar a la base de datos", http.StatusInternalServerError)
 		return
 	}
-	db.Where("id = ?", params["id"]).First(&user)
 
+	db.Where("id = ?", uid).First(&user)
+
+	db.Where("id = ?", uid).First(&user)
 	if user.UID == "" {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("User not found"))
 		return
 	}
-
 	json.NewEncoder(w).Encode(&user)
 }
 
@@ -88,7 +98,14 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Usuario eliminado con éxito"))
 }
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
+	claims, ok := r.Context().Value(middleware.UserContextKey).(*jwt.MapClaims)
+    if !ok {
+        http.Error(w, "Información del usuario no disponible", http.StatusInternalServerError)
+        return
+    }
+
+    uid := (*claims)["uid"].(string) 
+
 	var user models.User
 
 	db, err := utils.OpenDBGorm()
@@ -97,22 +114,20 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.Where("id = ?", params["id"]).First(&user)
+	db.Where("id = ?", uid).First(&user)
+
 	if user.UID == "" {
 		http.Error(w, "Usuario no encontrado", http.StatusNotFound)
 		return
 	}
-
 	// Decodificar solo los campos que deseas actualizar
 	var updates map[string]interface{}
 	if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
 		http.Error(w, "Error al decodificar los datos de actualización", http.StatusBadRequest)
 		return
 	}
-
 	// Actualiza los campos específicos
 	db.Model(&user).Updates(updates)
-
 	// Envía una respuesta exitosa
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Usuario actualizado con éxito"))
