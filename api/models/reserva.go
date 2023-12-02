@@ -33,3 +33,7 @@ type Reserva struct {
 	Estado                 string    `json:"comprado"`
 	Estrellas              int       `json:"estrellas"`
 }
+
+func (Reserva) TableName() string {
+	return "reserva"
+}
