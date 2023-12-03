@@ -15,7 +15,7 @@ func main() {
 	// Inicializa la configuración de Firebase
 	ctx := context.Background()
 	opt := option.WithCredentialsFile(".env")
-	config := &firebase.Config{ProjectID: "test-5eebf"}
+	config := &firebase.Config{ProjectID: "asdasdasdasd-82445"}
 	app, err := firebase.NewApp(ctx, config, opt)
 	if err != nil {
 		log.Fatalln(err)
@@ -33,5 +33,5 @@ func main() {
 	r := mux.NewRouter()
 	routes.ConfigureRoutes(r, app)
 
-	log.Fatal(http.ListenAndServe(":3000", r))
+	log.Fatal(http.ListenAndServe(":3001", r))
 }

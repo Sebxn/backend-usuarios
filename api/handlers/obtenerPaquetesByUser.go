@@ -130,14 +130,16 @@ func ObtenerPaquetesByUser(w http.ResponseWriter, r *http.Request) {
 
 		reservas = append(reservas, reserva)
 	}
-	// Convierte los resultados a JSON y envía la respuesta
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(reservas); err != nil {
-		http.Error(w, "Error al convertir a JSON", http.StatusInternalServerError)
-	}
-
 	if reservas == nil {
-		http.Error(w, "El usuario no tiene paquetes", http.StatusInternalServerError)
-		return
-	}
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusOK) // O considera usar http.StatusOK si una lista vacía es un caso normal
+        json.NewEncoder(w).Encode([]models.Reserva{}) // Envía una lista vacía
+        return
+    }
+
+    // Envía la respuesta
+    w.Header().Set("Content-Type", "application/json")
+    if err := json.NewEncoder(w).Encode(reservas); err != nil {
+        http.Error(w, "Error al convertir a JSON", http.StatusInternalServerError)
+    }
 }

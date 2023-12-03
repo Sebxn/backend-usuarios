@@ -8,7 +8,9 @@ import (
 	"net/http"
 	"os"
 	"time"
-
+	
+	"log"
+	"github.com/joho/godotenv"
 	"github.com/golang-jwt/jwt/v5"
 
 	firebase "firebase.google.com/go"
@@ -41,16 +43,20 @@ func generateJWTToken(uid string) (string, error) {
 
 type FirebaseResponse struct {
 	LocalId string `json:"localId"` // Assumiendo que el JSON de respuesta tiene un campo "localId"
-	// ... otros campos que esperas en la respuesta, como token, email, etc.
 }
 
 func LoginUser(resp http.ResponseWriter, req *http.Request, app *firebase.App) {
+
+	err := godotenv.Load(".env.credentials")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	email := req.FormValue("email")
 	password := req.FormValue("password")
 
 	// Define la URL del punto de conexión de Firebase Identity Toolkit para iniciar sesión con contraseña
-	url := "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAN5HyOCaS1NMqiVKgcYaN1s6fq3oJWbMw" // API KEY
+	url := "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + os.Getenv("FIREBASE_API_KEY")// API KEY
 
 	// Construye la carga útil de la solicitud JSON
 	payload := fmt.Sprintf(`{
@@ -60,7 +66,7 @@ func LoginUser(resp http.ResponseWriter, req *http.Request, app *firebase.App) {
     }`, email, password)
 
 	// Realiza la solicitud HTTP POST
-	response, err := http.Post(url, "application/login", bytes.NewBuffer([]byte(payload)))
+	response, err := http.Post(url, "application/json", bytes.NewBuffer([]byte(payload)))
 
 	if err != nil {
 		fmt.Fprintln(resp, "Error en la solicitud HTTP:", err)
