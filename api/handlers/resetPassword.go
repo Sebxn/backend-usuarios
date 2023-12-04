@@ -5,12 +5,21 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"os"
+	
+	"log"
+	"github.com/joho/godotenv"
 )
+
 
 func ResetPassword(w http.ResponseWriter, r *http.Request) error {
 	email := r.FormValue("email")
-	apiKey := "AIzaSyAN5HyOCaS1NMqiVKgcYaN1s6fq3oJWbMw" // Reemplaza con tu API Key
-	resetPasswordURL := "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=" + apiKey
+	
+	err := godotenv.Load(".env.credentials")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	resetPasswordURL := "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=" + os.Getenv("FIREBASE_API_KEY")
 	payload := `{
         "requestType": "PASSWORD_RESET",
         "email": "` + email + `"
