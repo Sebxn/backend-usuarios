@@ -7,12 +7,9 @@ import (
 	"fmt"
 	"net/http"
 
-
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
 )
-
-
 
 func RegisterUser(w http.ResponseWriter, r *http.Request, app *firebase.App) error {
 
@@ -79,6 +76,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request, app *firebase.App) err
 		Email:           email,
 		Rut:             r.FormValue("Rut"),
 		Fono:            r.FormValue("Fono"),
+		FotoPerfil:      "ruta_predeterminada/foto.png",
 	}
 
 	db, err := utils.OpenDBGorm()
@@ -93,10 +91,9 @@ func RegisterUser(w http.ResponseWriter, r *http.Request, app *firebase.App) err
 		return createdUser.Error
 	}
 
-
 	// Respond with "Contraseña exitosa" y el JWT token
 	fmt.Fprintln(w, "Contraseña exitosa")
-	fmt.Fprintln(w,  user.UID)
+	fmt.Fprintln(w, user.UID)
 	//dPYL3ow9FbMUgdJYddbLQ9Ohsve2
 	return nil
 }
