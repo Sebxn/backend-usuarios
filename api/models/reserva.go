@@ -32,6 +32,11 @@ type Reserva struct {
 	RowNum                 int       `json:"row_num"`
 	Estado                 string    `json:"comprado"`
 	Estrellas              int       `json:"estrellas"`
+	FechaReserva           time.Time `json:"fecha_reserva"`
+	ServiciosAdicionales   string    `json:"servicios_adicionales"`
+	Pasajeros              string    `json:"pasajeros"`
+	PrecioTotal            float64   `json:"precio_total"`
+	IDFechaPaquete         int       `json:"id_fechapaquete"`
 }
 
 func (Reserva) TableName() string {

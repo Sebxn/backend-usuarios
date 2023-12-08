@@ -32,7 +32,7 @@ func ConfigureRoutes(r *mux.Router, app *firebase.App) {
 	//paquetes comprados por el usuario
 	r.Handle("/user/mis_reservas", middleware.TokenAuthMiddleware(http.HandlerFunc(handlers.ObtenerPaquetesByUser))).Methods("GET", "OPTIONS")
 	r.Handle("/api/facturacion/actualizar_estado", http.HandlerFunc(handlers.ActualizarEstadoReserva))
-	
+	r.HandleFunc("/reserva/borrar", handlers.BorrarReserva).Methods("POST")
 	r.HandleFunc("/users/update_profile/{id}", handlers.UpdateProfile).Methods("PATCH") // ???
 
 	r.Handle("/login-google", http.HandlerFunc(handlers.LoginGoogle))
@@ -41,7 +41,6 @@ func ConfigureRoutes(r *mux.Router, app *firebase.App) {
 	r.HandleFunc("/users", handlers.AddUser).Methods("POST")
 	r.HandleFunc("/users", handlers.GetUsers).Methods("GET")
 	r.HandleFunc("/users/{id}", handlers.DeleteUser).Methods("DELETE")
-
 
 	r.HandleFunc("/reservas/valorar", handlers.ValorarReserva).Methods("POST")
 
